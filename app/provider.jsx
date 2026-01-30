@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./_components/AppSidebar";
 import AppHeader from "./_components/AppHeader";
 import { useUser } from "@clerk/nextjs";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { DefaultModel } from "@/shared/AiModelsShared";
@@ -15,6 +15,7 @@ function Provider({ children, ...props }) {
   const { user } = useUser();
   const [aiSelectedModels, setAiSelectedModels] = useState(DefaultModel);
   const [userDetail,setUserDetail] = useState();
+  const [messages,setMessages] = useState({});
 
   const CreateNewUser = async () => {
     // if user exists
@@ -24,7 +25,7 @@ function Provider({ children, ...props }) {
     if (userSnap.exists()) {
       console.log("Existing User");
       const userInfo = userSnap.data();
-      setAiSelectedModels(userInfo.selectedModelPref);
+      setAiSelectedModels(userInfo.selectedModelPref??DefaultModel);
       setUserDetail(userInfo);
       return;
     } else {
@@ -50,6 +51,21 @@ function Provider({ children, ...props }) {
     }
   }, [user]);
 
+  
+  const updateAIModelSelectionPref = async()=>{
+    //Update to firebase database
+    const docRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
+    await updateDoc(docRef, {
+      selectedModelPref: aiSelectedModels,
+    });
+  }
+
+  useEffect(()=>{
+    if(aiSelectedModels){
+      updateAIModelSelectionPref();
+    }
+  },[aiSelectedModels])
+
   return (
     <NextThemesProvider
       {...props}
@@ -59,7 +75,7 @@ function Provider({ children, ...props }) {
       disableTransitionOnChange
     >
       <UserDetailContext.Provider value={{userDetail,setUserDetail}}>
-      <AiSelectedModelContext.Provider value={{ aiSelectedModels, setAiSelectedModels }}>
+      <AiSelectedModelContext.Provider value={{ aiSelectedModels, setAiSelectedModels,messages,setMessages }}>
         <SidebarProvider>
           <AppSidebar />
           <div className="w-full">
