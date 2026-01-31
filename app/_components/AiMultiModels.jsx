@@ -19,6 +19,7 @@ import { db } from "@/config/FirebaseConfig";
 import { useUser } from "@clerk/nextjs";
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { useSearchParams } from "next/navigation";
 
 function AiMultiModels() {
   const { user } = useUser();
@@ -164,9 +165,9 @@ function AiMultiModels() {
                         </>
                       )}
                     </div>
-                    {m.content != "loading" &&
-                    <Markdown remarkPlugins={[remarkGfm]}>
-                      {m.content}
+                    {m?.content != "loading" &&
+                    m?.content && <Markdown remarkPlugins={[remarkGfm]}>
+                      {m?.content}
                     </Markdown>}
                   </div>
                 ))}
