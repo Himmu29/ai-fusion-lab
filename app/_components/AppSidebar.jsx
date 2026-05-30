@@ -17,6 +17,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import moment from "moment/moment";
 import Link from "next/link";
+import axios from "axios";
 
 export function AppSidebar() {
   const { theme, setTheme } = useTheme();
@@ -38,6 +39,7 @@ export function AppSidebar() {
 
   useEffect(() => {
     user && GetChatHistory();
+    user && getRemainingMsgs();
   }, [user]);
 
 
@@ -54,6 +56,11 @@ export function AppSidebar() {
         message:lastUserMsg,
         lastMsgDate:formattedDate
       }
+  }
+
+  const getRemainingMsgs = async() => {
+    const result = await axios.get('/api/user-remaining-msg');
+    console.log(result);
   }
 
   return (
