@@ -9,14 +9,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import { useUser } from "@clerk/nextjs";
-import { useSearchParams } from "next/navigation";
 
-function ChatInputBox() {
+function ChatInputBox({ params }) {
   const [userInput, setUserInput] = useState();
   const {aiSelectedModels, setAiSelectedModels, messages, setMessages} = useContext(AiSelectedModelContext);
   const [chatId,setChatId] = useState();
   const {user} = useUser();
-  const params = useSearchParams();
 
 
   const handleSend = async () => {
